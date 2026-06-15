@@ -77,14 +77,14 @@ const WorksSection = () => {
             variants={fadeInUp}
             className="text-sm md:text-base font-extrabold text-[#111111] tracking-widest uppercase mb-0"
           >
-            PROJETS SÉLECTIONNÉS
+            SITES CONÇUS POUR MES CLIENTS
           </motion.p>
 
           <motion.h2
             variants={fadeInUp}
             className="text-[76px] sm:text-[120px] md:text-[220px] font-extrabold tracking-tighter uppercase leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-[#111111] via-[#111111]/30 to-transparent opacity-90 translate-y-[10px] md:translate-y-[20px]"
           >
-            Works
+            WORK
           </motion.h2>
         </motion.div>
       </div>
