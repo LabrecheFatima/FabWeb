@@ -83,11 +83,9 @@ const ComparisonSection = () => {
   const p2OrangeKeywords = ["applications", "sur", "mesure."];
 
   return (
-    <div ref={containerRef} className="w-full h-[5vh] bg-gradient-to-b from-[#EAEAEA] via-[#F2F2F2] to-[#F2F2F2] z-20">
-      
+    <div ref={containerRef} className="w-full min-h-screen bg-gradient-to-b from-[#EAEAEA] via-[#F2F2F2] to-[#F2F2F2] relative z-30">  
       {/* LOCKED VIEWPORT WRAPPER */}
-      <div className="sticky top-0 left-0 w-full h-screen flex flex-col items-center justify-center overflow-hidden select-none font-['Plus_Jakarta_Sans'] bg-[#e8e6e6] py-0 z-20">
-        
+      <div className="sticky top-0 left-0 w-full h-screen flex flex-col items-center justify-center overflow-hidden select-none font-['Plus_Jakarta_Sans'] bg-[#e8e6e6] pt-20 pb-6 z-30">  
         {/* CENTERED LAYOUT WRAPPER */}
         <div className="max-w-[840px] w-full px-6 md:px-12 flex flex-col items-center justify-center gap-8 md:gap-10 text-center">
           
@@ -121,24 +119,40 @@ const ComparisonSection = () => {
             </motion.div>
           </div>
           
-          {/* PARAGRAPHE 1 */}
+          {/* PARAGRAPHE 1 (CORRIGÉ : Pas de cassure sur full-stack) */}
           <p className="text-[26px] sm:text-[32px] md:text-[42px] font-extrabold text-[#111111] leading-[1.25] tracking-tighter flex flex-wrap justify-center">
-            {paragraph1.split("").map((char, index) => {
-              const keywordTarget = "ingénieur full-stack";
-              const p1Idx = paragraph1.indexOf(keywordTarget);
-              const isKeyword = index >= p1Idx && index < p1Idx + keywordTarget.length;
+            {paragraph1.split(" ").map((word, wordIdx) => {
+              // Calculer la position absolue des caractères pour l'effet de scroll
+              const wordsArray = paragraph1.split(" ");
+              const precedingCharsCount = wordsArray.slice(0, wordIdx).join(" ").length + (wordIdx > 0 ? 1 : 0);
 
               return (
-                <ScrollChar 
-                  key={`p1-${index}`}
-                  char={char}
-                  index={index}
-                  totalLength={paragraph1.length}
-                  progress={scrollYProgress}
-                  isKeyword={isKeyword}
-                  rangeStart={0.0}
-                  rangeEnd={0.35}
-                />
+                <span 
+                  key={`p1-word-${wordIdx}`} 
+                  className={`inline-block ${word.includes("full-stack") ? "whitespace-nowrap" : ""}`}
+                >
+                  {word.split("").map((char, charIdx) => {
+                    const absoluteCharIndex = precedingCharsCount + charIdx;
+                    const keywordTarget = "ingénieur full-stack";
+                    const p1Idx = paragraph1.indexOf(keywordTarget);
+                    const isKeyword = absoluteCharIndex >= p1Idx && absoluteCharIndex < p1Idx + keywordTarget.length;
+
+                    return (
+                      <ScrollChar 
+                        key={`p1-char-${absoluteCharIndex}`}
+                        char={char}
+                        index={absoluteCharIndex}
+                        totalLength={paragraph1.length}
+                        progress={scrollYProgress}
+                        isKeyword={isKeyword}
+                        rangeStart={0.0}
+                        rangeEnd={0.35}
+                      />
+                    );
+                  })}
+                  {/* Ajouter un espace après chaque mot */}
+                  <span className="inline-block">&nbsp;</span>
+                </span>
               );
             })}
           </p>
@@ -150,7 +164,7 @@ const ComparisonSection = () => {
               const isWordOrange = p2OrangeKeywords.includes(cleanWord);
 
               const wordsArray = paragraph2.split(" ");
-              const precedingCharsCount = wordsArray.slice(0, wordIdx).join(" ").length;
+              const precedingCharsCount = wordsArray.slice(0, wordIdx).join(" ").length + (wordIdx > 0 ? 1 : 0);
 
               return (
                 <span key={`word-block-${wordIdx}`} className="inline-flex items-center justify-center flex-wrap">
@@ -196,27 +210,26 @@ const ComparisonSection = () => {
             })}
           </p>
 
-          {/* CORRECTION DU BLOC BOUTONS : Toujours visibles avec animation d'entrée standard */}
-            <motion.a 
-              href="https://wa.me/213780334395"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.01, y: -1 }}
-              whileTap={{ scale: 0.99 }}
-              className="group flex items-center justify-between w-[60%] md:w-[175px] h-[42px] pl-4 pr-1 bg-black text-white font-semibold text-[14px] rounded-full shadow-[0_15px_35px_-10px_rgba(0,0,0,0.35)] transition-shadow duration-300 hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.45)] no-underline"
-            >
-              <span>Contactez-nous</span>
-              <div className="w-[30px] h-[30px] bg-[#FF5F25] rounded-full flex items-center justify-center overflow-hidden" style={{ perspective: 1000 }}>
-                <motion.div 
-                  className="flex items-center justify-center w-full h-full"
-                  variants={arrowFlipVariants}
-                  animate="animate"
-                >
-                  <ArrowUpRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
-                </motion.div>
-              </div>
-            </motion.a>
-            <Footer/>
+          {/* CORRECTION DU BLOC BOUTONS */}
+          <motion.a 
+            href="https://wa.me/213780334395"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.01, y: -1 }}
+            whileTap={{ scale: 0.99 }}
+            className="group flex items-center justify-between w-[60%] md:w-[175px] h-[42px] pl-4 pr-1 bg-black text-white font-semibold text-[14px] rounded-full shadow-[0_15px_35px_-10px_rgba(0,0,0,0.35)] transition-shadow duration-300 hover:shadow-[0_20px_40px_-8px_rgba(0,0,0,0.45)] no-underline"
+          >
+            <span>Contactez-nous</span>
+            <div className="w-[30px] h-[30px] bg-[#FF5F25] rounded-full flex items-center justify-center overflow-hidden" style={{ perspective: 1000 }}>
+              <motion.div 
+                className="flex items-center justify-center w-full h-full"
+                variants={arrowFlipVariants}
+                animate="animate"
+              >
+                <ArrowUpRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+              </motion.div>
+            </div>
+          </motion.a>
         </div>
       </div>
     </div>
