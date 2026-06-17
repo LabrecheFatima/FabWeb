@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// 1. IMPORTATION DES IMAGES
-import image2 from '../assets/image2.jpg'; 
-import image3 from '../assets/image3.jpg'; 
-import image4 from '../assets/image4.jpg'; 
-import image54 from '../assets/image54.jpg'; 
+// 1. IMPORTATION DES IMAGES (Assurez-vous de les convertir en .webp pour de meilleures performances !)
+import image2 from '../assets/image2.webp'; 
+import image3 from '../assets/image3.webp'; 
+import image4 from '../assets/image4.webp'; 
+import image54 from '../assets/image54.webp'; 
 
 const worksData = [
   {
@@ -42,26 +42,36 @@ const worksData = [
   }
 ];
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-  }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 }
-  }
-};
-
 const WorksSection = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Détecter si l'utilisateur est sur mobile pour alléger le rendu
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Animations optimisées (Moins d'effets de déplacement 'y' sur mobile)
+  const fadeInUp = {
+    hidden: { opacity: 0, y: isMobile ? 10 : 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: isMobile ? 0.4 : 0.8, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: isMobile ? 0.05 : 0.15 }
+    }
+  };
+
   return (
-    /* RE-STYLE TOTAL EN FOND BLANC/GRIS SOLIDE ET NET (Z-10 SANS DÉGRADÉ EXTÉRIEUR) */
     <section className="w-full bg-[#F2F2F2] pt-6 pb-20 md:pb-36 px-4 md:px-6 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans'] selection:bg-[#FF5F25] selection:text-white overflow-hidden relative gap-6 md:gap-10 z-10">
       
       {/* 1. HEADER SYSTEM */}
@@ -69,7 +79,7 @@ const WorksSection = () => {
         <motion.div 
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.1 }} // Plus petit seuil pour un déclenchement rapide
           variants={staggerContainer}
           className="flex flex-col items-center justify-center text-center w-full"
         >
@@ -93,11 +103,11 @@ const WorksSection = () => {
       {worksData.map((project) => (
         <motion.div
           key={project.id}
-          initial={{ opacity: 0, y: 60 }}
+          initial={isMobile ? { opacity: 0 } : { opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-[1280px] mx-auto px-6 md:px-12 py-12 md:py-16 bg-gradient-to-br from-[#080808] to-[#121212] rounded-[32px] md:rounded-[48px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6),0_0_60px_rgba(255,255,255,0.12)] flex flex-col lg:flex-row items-center lg:items-stretch justify-between gap-8 z-10"
+          viewport={{ once: true, amount: 0.05 }} // Déclenchement immédiat dès que la carte apparaît
+          transition={{ duration: isMobile ? 0.5 : 1, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-[1280px] mx-auto px-6 md:px-12 py-12 md:py-16 bg-gradient-to-br from-[#080808] to-[#121212] rounded-[32px] md:rounded-[48px] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] md:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6),0_0_60px_rgba(255,255,255,0.12)] flex flex-col lg:flex-row items-center lg:items-stretch justify-between gap-8 z-10 will-change-transform"
         >
           
           {/* COLONNE GAUCHE : INFOS DU PROJET */}
@@ -124,18 +134,19 @@ const WorksSection = () => {
                 <a href={project.link} target="_blank" rel="noopener noreferrer" className="hover:text-[#FF5F25] transition-colors duration-300 block">
                   {project.title}
                 </a>
-                <div className="absolute inset-0 bg-white/10 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full" />
+                {/* On cache le flou lourd derrière le texte sur mobile */}
+                <div className="hidden md:block absolute inset-0 bg-white/10 blur-[50px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-full" />
               </h3>
             </motion.div>
           </motion.div>
 
           {/* COLONNE DROITE (IMAGE) */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={isMobile ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="flex-[1.6] flex items-center justify-center relative w-full h-auto min-h-[350px] sm:min-h-[480px] md:min-h-[580px] lg:h-[640px] order-2 lg:order-none my-0"
+            transition={{ duration: isMobile ? 0.5 : 1, ease: [0.16, 1, 0.3, 1], delay: isMobile ? 0 : 0.1 }}
+            className="flex-[1.6] flex items-center justify-center relative w-full h-auto min-h-[300px] sm:min-h-[480px] md:min-h-[580px] lg:h-[640px] order-2 lg:order-none my-0"
           >
             <div className="relative w-full h-full aspect-[3/4] lg:aspect-auto max-w-[1000px] overflow-hidden flex items-center justify-center">
               
@@ -146,14 +157,15 @@ const WorksSection = () => {
                 className="w-full h-full block group cursor-pointer"
               >
                 <motion.div 
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={isMobile ? {} : { scale: 1.02 }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative w-full h-full rounded-[24px] md:rounded-[36px] overflow-hidden border border-white/10 shadow-[0_30px_70px_rgba(0,0,0,0.5)] bg-[#111111]"
+                  className="relative w-full h-full rounded-[24px] md:rounded-[36px] overflow-hidden border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)] md:shadow-[0_30px_70px_rgba(0,0,0,0.5)] bg-[#111111]"
                 >
                   <img 
                     src={project.img} 
                     alt={project.title}
-                    className="w-full h-full object-cover object-center pointer-events-none select-none transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy" 
+                    className="w-full h-full object-cover object-center pointer-events-none select-none transition-transform duration-700 md:group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 </motion.div>
